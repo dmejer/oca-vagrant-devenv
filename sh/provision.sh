@@ -2,21 +2,11 @@
 
 VAGRANT_DIR=/vagrant
 
-setEncodings() {
-	sudo echo "LANG=en_US.UTF-8" >> /etc/environment
-	sudo echo "LANGUAGE=en_US.UTF-8" >> /etc/environment
-	sudo echo "LC_ALL=en_US.UTF-8" >> /etc/environment
-	sudo echo "LC_CTYPE=en_US.UTF-8" >> /etc/environment
-}
-
 createDirs()
 {
     echo 'Creating directories'
     indent; echo 'Creating vagrant dir'
     mkdir $VAGRANT_DIR
-	
-	indent; echo 'Creating project file dir'
-	mkdir $VAGRANT_DIR
 }
 
 installJDK() {
@@ -28,16 +18,20 @@ installJDK() {
 	sudo apt-get -y install oracle-java8-installer
 }
 
-run() {
-	setEncodings
-	createDirectories
-
-	installJDK
+cloneRepo() {
+	ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+	git clone git@github.com:dmejer/oca-training.git
 }
 
-if [ ! -f "/var/vagrant_provision" ]; then
-	sudo touch /var/vagrant_provision
-	run
-else
-	echo "Nothing"
-fi
+run() {
+	createDirectories
+	
+	installJDK
+	
+	sudo apt-get install -y git
+	
+	cloneRepo
+}
+
+# run once
+run
